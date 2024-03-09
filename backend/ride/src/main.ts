@@ -1,30 +1,6 @@
 import crypto from "crypto";
-import pgp from "pg-promise";
-import express, { Request, Response } from 'express'
 import { AccountDAO } from "./AccountDAO";
 
-const app = express();
-app.use(express.json())
-
-app.post('/signup', async function (req: Request, res: Response) {
-    try{
-        const input = req.body;
-        const output = await signup(input);
-        res.json(output);
-    }catch(e: any){
-        res.status(422).json({
-            message: e.message
-        })
-    }
-})
-
-app.get('/accounts/:accountId', async function (req: Request, res: Response) {
-    const accountId = req.params.accountId;
-    const output = await getAccount(accountId);
-    res.json(output);
-})
-
-app.listen(3000);
 
 function validateCpf (cpf: string) {
 	if (!cpf) return false
@@ -63,7 +39,7 @@ function extractCheckDigit (cpf: string){
 }
 
 
-async function signup (input: any): Promise<any> {
+export async function signup (input: any): Promise<any> {
 	const accountDAO = new AccountDAO()
 	input.accountId = crypto.randomUUID();
 	const account = await accountDAO.getByEmail(input.email)
@@ -91,10 +67,8 @@ function isInvalidCarPlate(carPlate: string){
 }
 
 
-async function getAccount(accountId: string){
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-	const [account] = await connection.query("select * from cccat14.account where account_id = $1", [accountId])
-	await connection.$pool.end();
-
+export async function getAccount(accountId: string){
+	const accountDAO = new AccountDAO();
+	const account = await accountDAO.getById(accountId);
 	return account;
 }
