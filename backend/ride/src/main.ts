@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import pgp from "pg-promise";
 import express, { Request, Response } from 'express'
+import { AccountDAO } from "./AccountDAO";
 
 const app = express();
 app.use(express.json())
@@ -63,22 +64,18 @@ function extractCheckDigit (cpf: string){
 
 
 async function signup (input: any): Promise<any> {
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-	try {
-		const accountId = crypto.randomUUID();
-		const [account] = await connection.query("select * from cccat14.account where email = $1", [input.email]);
-		if (account) throw new Error("Duplicated account")
-		if (isInvalidName(input.name)) throw new Error("Invalid name")
-		if (isInvalidEmail(input.email)) throw new Error("Invalid email")
-		if (!validateCpf(input.cpf)) throw new Error("Invalid cpf")
-		if (input.isDriver && isInvalidCarPlate(input.carPlate)) throw new Error("Invalid car plate")
-		await connection.query("insert into cccat14.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)", [accountId, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver]);
-		return {
-			accountId
-		};
-	} finally {
-		await connection.$pool.end();
-	}
+	const accountDAO = new AccountDAO()
+	input.accountId = crypto.randomUUID();
+	const account = await accountDAO.getByEmail(input.email)
+	if (account) throw new Error("Duplicated account")
+	if (isInvalidName(input.name)) throw new Error("Invalid name")
+	if (isInvalidEmail(input.email)) throw new Error("Invalid email")
+	if (!validateCpf(input.cpf)) throw new Error("Invalid cpf")
+	if (input.isDriver && isInvalidCarPlate(input.carPlate)) throw new Error("Invalid car plate")
+	await accountDAO.save(input)
+	return {
+		accountId: input.accountId
+	};
 }
 
 function isInvalidName(name: string){
