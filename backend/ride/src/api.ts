@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
-import { getAccount, signup } from './main';
-
+import { signup } from './Signup';
+import { getAccount } from './GetAccount';
 
 const app = express();
 app.use(express.json())
