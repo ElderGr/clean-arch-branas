@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { AccountDAO } from "./AccountDAO";
+import { AccountDAO } from "./AccountDAODatabase";
 
 
 export function validateCpf (cpf: string) {

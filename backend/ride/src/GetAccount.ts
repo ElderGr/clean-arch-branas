@@ -1,4 +1,4 @@
-import { AccountDAO } from "./AccountDAO";
+import { AccountDAO } from "./AccountDAODatabase";
 
 export class GetAccount {
 	accountDAO: AccountDAO;
