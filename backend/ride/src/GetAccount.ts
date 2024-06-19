@@ -1,12 +1,9 @@
-import { AccountDAO } from "./AccountDAODatabase";
+import { AccountDAODatabase } from "./AccountDAODatabase";
 
 export class GetAccount {
-	accountDAO: AccountDAO;
-	constructor(){
-		this.accountDAO = new AccountDAO();
-	}
+	constructor(private accountDAODatabase: AccountDAODatabase){}
 	execute(accountId: string){
-		const account = this.accountDAO.getById(accountId);
+		const account = this.accountDAODatabase.getById(accountId);
 		return account;
 	}
 }

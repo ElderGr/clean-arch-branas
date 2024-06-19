@@ -2,8 +2,9 @@ import axios from "axios"
 import { Signup } from "../src/Signup";
 import { GetAccount } from "../src/GetAccount";
 import sinon from 'sinon'
-import { AccountDAO } from "../src/AccountDAODatabase";
-import { Logger } from "../src/Logger";
+import { AccountDAODatabase } from "../src/AccountDAODatabase";
+import { Logger } from "../src/LoggerConsole";
+import { AccountDAO } from "../src/AccountDAO";
 
 axios.defaults.validateStatus = function() {
 	return true;
@@ -13,14 +14,15 @@ let signup: Signup;
 let getAccount: GetAccount;
 
 beforeEach(() => {
-	const accountDAO = new AccountDAO();
-	signup = new Signup();
-	getAccount = new GetAccount();
+	const accountDAO = new AccountDAODatabase();
+	const logger = new Logger();
+	signup = new Signup(accountDAO, logger);
+	getAccount = new GetAccount(accountDAO);
 })
 
 test("Deve criar conta para o passageiro com stub", async function(){
-	const stubAccountDAOSave = sinon.stub(AccountDAO.prototype, "save").resolves();
-	const stubAccountDAOGetByEmail = sinon.stub(AccountDAO.prototype, "getByEmail").resolves(null);
+	const stubAccountDAOSave = sinon.stub(AccountDAODatabase.prototype, "save").resolves();
+	const stubAccountDAOGetByEmail = sinon.stub(AccountDAODatabase.prototype, "getByEmail").resolves(null);
 	const inputSignup = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -30,7 +32,7 @@ test("Deve criar conta para o passageiro com stub", async function(){
 	};
 	const outputSignup = await signup.execute(inputSignup);
 	expect(outputSignup.accountId).toBeDefined();
-	const stubAccountDAOGetById = sinon.stub(AccountDAO.prototype, "getById").resolves(inputSignup);
+	const stubAccountDAOGetById = sinon.stub(AccountDAODatabase.prototype, "getById").resolves(inputSignup);
 
 	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
 
@@ -41,7 +43,7 @@ test("Deve criar conta para o passageiro com stub", async function(){
 	stubAccountDAOGetById.restore();
 })
 
-test.only("Deve criar conta para o passageiro com mock", async function(){
+test("Deve criar conta para o passageiro com mock", async function(){
 	const inputSignup = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -60,6 +62,7 @@ test.only("Deve criar conta para o passageiro com mock", async function(){
 	expect(outputGetAccount.name).toBe(inputSignup.name);
 	expect(outputGetAccount.email).toBe(inputSignup.email);
 	mockLogger.verify();
+	mockLogger.restore();
 })
 
 test("Não deve criar conta se o nome for inválido", async function(){
@@ -141,6 +144,7 @@ test("Deve criar uma conta para o motorista", async function(){
 	expect(outputGetAccount.email).toBe(inputSignup.email);
 	expect(spyLoggerLog.calledOnce).toBeTruthy();
 	expect(spyLoggerLog.calledWith("signup John Doe")).toBeTruthy();
+	spyLoggerLog.restore();
 })
 
 test("Não deve criar conta para o motorista com a placa inválida", async function(){
@@ -155,4 +159,39 @@ test("Não deve criar conta para o motorista com a placa inválida", async funct
 	};
 	
 	await expect(() => signup.execute(inputSignup)).rejects.toThrow(new Error("Invalid car plate"));
+})
+
+test("Deve criar conta para o passageiro com fake", async function(){
+	const inputSignup = {
+		name: "John Doe",
+		email: `john.doe${Math.random()}@gmail.com`,
+		cpf: "97456321558",
+		isPassenger: true,
+		password: "123456"
+	};
+
+	const accountDAO: AccountDAO = {
+		async save (account: any): Promise<void> {},
+		async getById (accountId: string): Promise<any> {
+			return inputSignup
+		},
+		async getByEmail (email: string): Promise<any> {
+			return undefined
+		}
+	}
+
+	const logger: Logger = {
+		log (message: string): void {}
+	}
+
+	const signup = new Signup(accountDAO, logger);
+	const getAccount = new GetAccount(accountDAO);
+
+	const outputSignup = await signup.execute(inputSignup);
+	expect(outputSignup.accountId).toBeDefined();
+
+	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
+
+	expect(outputGetAccount.name).toBe(inputSignup.name);
+	expect(outputGetAccount.email).toBe(inputSignup.email);
 })

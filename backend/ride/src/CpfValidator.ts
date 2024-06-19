@@ -1,7 +1,3 @@
-import crypto from "crypto";
-import { AccountDAO } from "./AccountDAODatabase";
-
-
 export function validateCpf (cpf: string) {
 	if (!cpf) return false
 	cpf = clean(cpf);
