@@ -21,4 +21,9 @@ export class RideDAODatabase implements RideDAO {
 		await connection.$pool.end();
         return ride;
     }
+    async update(ride: any): Promise<void> {
+	    const connection = pgp()("postgres://admin:root@localhost:5432");
+		await connection.query("update cccat14.ride  set status = $1, driver_id = $2 where ride_id = $3", [ride.status, ride.driverId, ride.ride_id]);
+		await connection.$pool.end();   
+    }
 }

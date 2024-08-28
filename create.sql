@@ -14,6 +14,7 @@ create table cccat14.account (
 create table cccat14.ride (
 	ride_id uuid primary key,
 	passenger_id uuid,
+	driver_id uuid,
 	fare numeric,
 	distance numeric,
 	status text,
