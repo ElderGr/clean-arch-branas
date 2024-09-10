@@ -1,7 +1,7 @@
-import { AccountDAODatabase } from "./AccountDAODatabase";
+import { AccountRepositoryDatabase } from "./AccountRepositoryDatabase";
 
 export class GetAccount {
-	constructor(private accountDAODatabase: AccountDAODatabase){}
+	constructor(private accountDAODatabase: AccountRepositoryDatabase){}
 	execute(accountId: string){
 		const account = this.accountDAODatabase.getById(accountId);
 		return account;

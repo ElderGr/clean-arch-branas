@@ -1,7 +1,7 @@
 import Account from "../src/Account";
 
 test("Deve criar uma conta", function(){
-    const account = new Account(
+    const account = Account.create(
         "Jonh Doe",
         'jonh.doe@gmail.com',
         "97456321558",

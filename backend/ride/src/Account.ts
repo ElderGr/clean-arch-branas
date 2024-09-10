@@ -10,7 +10,8 @@ export default class Account {
     isDriver: boolean;
     accountId: string;
 
-    constructor (
+    private constructor (
+        accountId: string,
         name: string, 
         email: string, 
         cpf: string, 
@@ -22,7 +23,8 @@ export default class Account {
 		if (this.isInvalidEmail(email)) throw new Error("Invalid email");
 		if (!validateCpf(cpf)) throw new Error("Invalid cpf");
         if (isDriver && this.isInvalidCarPlate(carPlate)) throw new Error("Invalid car plate")
-		
+        
+        this.accountId = accountId;
         this.accountId = crypto.randomUUID();
         this.name = name;
         this.email = email;
@@ -30,6 +32,15 @@ export default class Account {
         this.carPlate = carPlate;
         this.isPassenger = isPassenger;
         this.isDriver = isDriver;
+    }
+
+    static create(name: string, email: string, cpf: string, carPlate: string, isPassenger: boolean, isDriver: boolean) {
+        const accountId = crypto.randomUUID();
+        return new Account(accountId, name, email, cpf, carPlate, isPassenger, isDriver);
+    } 
+
+    static restore(accountId: string, name: string, email: string, cpf: string, carPlate: string, isPassenger: boolean, isDriver: boolean){
+        return new Account(accountId, name, email, cpf, carPlate, isPassenger, isDriver);
     }
 
     isInvalidName(name: string){

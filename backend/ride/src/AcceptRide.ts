@@ -1,15 +1,15 @@
 import { RideDAO } from "./RideDAO";
-import { AccountDAO } from "./AccountDAO";
+import { AccountRepository } from "./AccountRepository";
 
 export class AcceptRide{
 	constructor(
 		private rideDAO: RideDAO,
-		private accountDAO: AccountDAO
+		private accountDAO: AccountRepository
 	){}
 	
 	async execute(input: any){
 		const account = await this.accountDAO.getById(input.driverId);
-		if(!account.is_driver) throw new Error("Only drivers can accept rides");
+		if(account && !account.isDriver) throw new Error("Only drivers can accept rides");
 		const ride = await this.rideDAO.getById(input.rideId);
 		ride.status = "accepted";
 		ride.driverId = input.driverId;

@@ -1,5 +1,4 @@
 import pgp from 'pg-promise'
-import { AccountDAO } from './AccountDAO';
 import { RideDAO } from './RideDAO';
 export class RideDAODatabase implements RideDAO {
     async getActiveRideByPassengerId(passengerId: string): Promise<any> {
