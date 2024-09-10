@@ -1,11 +1,11 @@
-import crypto from "crypto";
 import { Logger } from "./Logger";
-import { RideDAO } from "./RideDAO";
+import { RideRepository } from "./RideRepository";
 import { AccountRepository } from "./AccountRepository";
+import Ride from "./Ride";
 
 export class RequestRide{
 	constructor(
-		private rideDAO: RideDAO,
+		private rideDAO: RideRepository,
 		private accountDAO: AccountRepository,
 		private logger: Logger
 	){}
@@ -17,12 +17,16 @@ export class RequestRide{
 		if(!account.isPassenger) throw new Error("Only passengers can request a ride");
 		const activeRide = await this.rideDAO.getActiveRideByPassengerId(input.passengerId);
 		if(activeRide) throw new Error("Passenger has an active ride");
-		input.rideId = crypto.randomUUID();
-		input.status = "requested";
-		input.date = new Date();
-		await this.rideDAO.save(input);
+		const ride = Ride.create(
+			input.passengerId,
+			input.fromLat,
+			input.fromLong,
+			input.toLat,
+			input.toLong
+		)
+		await this.rideDAO.save(ride);
 		return {
-			rideId: input.rideId
+			rideId: ride.rideId
 		};
 	}
 }

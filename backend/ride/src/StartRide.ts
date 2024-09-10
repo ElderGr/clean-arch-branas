@@ -1,14 +1,14 @@
-import { RideDAO } from "./RideDAO";
+import { RideRepository } from "./RideRepository";
 
 export class StartRide{
 	constructor(
-		private rideDAO: RideDAO,
+		private rideDAO: RideRepository,
 	){}
 	
 	async execute(input: any){
 		const ride = await this.rideDAO.getById(input.rideId);
-		ride.status = "in_progress";
-		ride.driverId = input.driverId;
+		if(!ride) throw new Error("Ride not found");
+		ride.start();
 		await this.rideDAO.update(ride);
 	}
 }
