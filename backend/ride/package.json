@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "jest --watchAll",
-    "start:dev": "nodemon src/api.ts"
+    "start:dev": "nodemon src/main.ts"
   },
   "devDependencies": {
     "@types/sinon": "^17.0.3",

@@ -11,17 +11,17 @@ export class Signup{
 		this.logger = logger
 	}
 	
-	async execute(input: any){
-		this.logger.log(`signup ${input.name}`)
+	async execute(input: Input): Promise<Output> {
+		this.logger.log(`signup ${input.name}`);
 		const existingAccount = await this.accountDAO.getByEmail(input.email)
 		if (existingAccount) throw new Error("Duplicated account");
 		const account = Account.create(
 			input.name,
 			input.email,
 			input.cpf,
-			input.carPlate,
-			input.isPassenger,
-			input.isDriver
+			input.carPlate || "",
+			!!input.isPassenger,
+			!!input.isDriver
 		);
 		await this.accountDAO.save(account)
 		return {
@@ -30,3 +30,16 @@ export class Signup{
 	}
 }
 
+type Input = {
+	name: string,
+	email: string,
+	cpf: string,
+	carPlate?: string,
+	isPassenger?: boolean,
+	isDriver?: boolean,
+	password: string,
+}
+
+type Output = {
+	accountId: string
+}

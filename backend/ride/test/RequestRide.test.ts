@@ -6,6 +6,8 @@ import { Logger } from "../src/LoggerConsole";
 import { RequestRide } from "../src/RequestRide";
 import { GetRide } from "../src/GetRide";
 import { RideRepositoryDatabase } from "../src/RideRepositoryDatabase";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
+import DatabaseConnection from "../src/DatabaseConnection";
 
 axios.defaults.validateStatus = function() {
 	return true;
@@ -15,9 +17,11 @@ let signup: Signup;
 let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
+let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
-	const accountDAO = new AccountRepositoryDatabase();
+	databaseConnection = new PgPromiseAdapter();
+	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
 	const rideDAO = new RideRepositoryDatabase();
 
@@ -102,4 +106,8 @@ test("Não deve poder solicitar uma corrida se a conta não existir", async func
 	}
 	await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account does not exist"));
 
+})
+
+afterEach(async () => {
+	await databaseConnection.close();
 })

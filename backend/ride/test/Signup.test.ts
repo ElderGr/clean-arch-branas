@@ -6,6 +6,8 @@ import { AccountRepositoryDatabase } from "../src/AccountRepositoryDatabase";
 import { Logger } from "../src/LoggerConsole";
 import { AccountRepository } from "../src/AccountRepository";
 import Account from "../src/Account";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
+import DatabaseConnection from "../src/DatabaseConnection";
 
 axios.defaults.validateStatus = function() {
 	return true;
@@ -13,9 +15,11 @@ axios.defaults.validateStatus = function() {
 
 let signup: Signup;
 let getAccount: GetAccount;
+let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
-	const accountDAO = new AccountRepositoryDatabase();
+	databaseConnection = new PgPromiseAdapter();
+	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
 	signup = new Signup(accountDAO, logger);
 	getAccount = new GetAccount(accountDAO);
@@ -178,19 +182,11 @@ test("Deve criar conta para o passageiro com fake", async function(){
 		password: "123456"
 	};
 
-	const accountDAO: AccountRepository = {
-		async save (account: any): Promise<void> {},
-		async getById (accountId: string): Promise<any> {
-			return inputSignup
-		},
-		async getByEmail (email: string): Promise<any> {
-			return undefined
-		}
-	}
-
 	const logger: Logger = {
 		log (message: string): void {}
 	}
+
+	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 
 	const signup = new Signup(accountDAO, logger);
 	const getAccount = new GetAccount(accountDAO);
@@ -202,4 +198,8 @@ test("Deve criar conta para o passageiro com fake", async function(){
 
 	expect(outputGetAccount?.name).toBe(inputSignup.name);
 	expect(outputGetAccount?.email).toBe(inputSignup.email);
+})
+
+afterEach(async () => {
+	await databaseConnection.close();
 })

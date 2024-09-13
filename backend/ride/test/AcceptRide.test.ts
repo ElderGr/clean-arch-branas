@@ -6,15 +6,19 @@ import { RequestRide } from "../src/RequestRide";
 import { GetRide } from "../src/GetRide";
 import { RideRepositoryDatabase } from "../src/RideRepositoryDatabase";
 import { AcceptRide } from "../src/AcceptRide";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
+import DatabaseConnection from "../src/DatabaseConnection";
 
 let signup: Signup;
 let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
+let databaseConnection: DatabaseConnection;
 
-beforeEach(() => {
-	const accountDAO = new AccountRepositoryDatabase();
+beforeEach(() => {	
+	databaseConnection = new PgPromiseAdapter();
+	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
 	const rideDAO = new RideRepositoryDatabase();
 
@@ -96,3 +100,7 @@ test("Não deve aceitar uma corrida se a conta não for de um motorista", async 
 
 	await expect(() => acceptRide.execute(inputAcceptRide)).rejects.toThrow(new Error("Only drivers can accept rides"));	
 });
+
+afterEach(async () =>{
+	await databaseConnection.close();
+})
