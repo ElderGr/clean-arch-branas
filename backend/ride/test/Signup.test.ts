@@ -1,13 +1,12 @@
 import axios from "axios"
-import { Signup } from "../src/Signup";
-import { GetAccount } from "../src/GetAccount";
+import { GetAccount } from "../src/application/usecases/GetAccount";
 import sinon from 'sinon'
-import { AccountRepositoryDatabase } from "../src/AccountRepositoryDatabase";
-import { Logger } from "../src/LoggerConsole";
-import { AccountRepository } from "../src/AccountRepository";
-import Account from "../src/Account";
-import PgPromiseAdapter from "../src/PgPromiseAdapter";
-import DatabaseConnection from "../src/DatabaseConnection";
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepositoryDatabase";
+import { Logger } from "../src/infra/logger/LoggerConsole";
+import DatabaseConnection from "../src/infra/database/DatabaseConnection";
+import { Signup } from "../src/application/usecases/Signup";
+import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
+import Account from "../src/domain/Account";
 
 axios.defaults.validateStatus = function() {
 	return true;

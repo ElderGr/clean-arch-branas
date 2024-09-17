@@ -1,4 +1,4 @@
-import { AccountRepositoryDatabase } from "./AccountRepositoryDatabase";
+import { AccountRepositoryDatabase } from "../../infra/repository/AccountRepositoryDatabase";
 
 export class GetAccount {
 	constructor(private accountDAODatabase: AccountRepositoryDatabase){}

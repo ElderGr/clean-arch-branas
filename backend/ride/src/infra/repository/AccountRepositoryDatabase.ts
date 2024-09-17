@@ -1,7 +1,7 @@
 import pgp from 'pg-promise'
-import { AccountRepository } from './AccountRepository';
-import Account from './Account';
-import DatabaseConnection from './DatabaseConnection';
+import DatabaseConnection from '../database/DatabaseConnection';
+import Account from '../../domain/Account';
+import { AccountRepository } from '../../application/repository/AccountRepository';
 export class AccountRepositoryDatabase implements AccountRepository {
     constructor(readonly connection: DatabaseConnection) {}
     async save(account: Account) {

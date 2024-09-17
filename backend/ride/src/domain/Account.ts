@@ -1,5 +1,5 @@
-import { validateCpf } from "./CpfValidator";
 import crypto from "crypto";
+import { validateCpf } from "./CpfValidator";
 
 export default class Account {
     name: string;

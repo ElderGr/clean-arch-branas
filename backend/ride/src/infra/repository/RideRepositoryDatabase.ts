@@ -1,6 +1,6 @@
 import pgp from 'pg-promise'
-import { RideRepository } from './RideRepository';
-import Ride from './Ride';
+import Ride from '../../domain/Ride';
+import { RideRepository } from '../../application/repository/RideRepository';
 export class RideRepositoryDatabase implements RideRepository {
     async getActiveRideByPassengerId(passengerId: string): Promise<Ride | undefined> {
         const connection = pgp()("postgres://admin:root@localhost:5432");

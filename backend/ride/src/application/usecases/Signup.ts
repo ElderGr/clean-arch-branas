@@ -1,6 +1,7 @@
-import { Logger } from "./Logger";
-import { AccountRepository } from "./AccountRepository";
-import Account from "./Account";
+import Account from "../../domain/Account";
+import { Logger } from "../../infra/logger/LoggerConsole";
+import { AccountRepository } from "../repository/AccountRepository";
+
 
 export class Signup{
 	accountDAO: AccountRepository

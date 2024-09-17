@@ -1,5 +1,6 @@
-import { Logger } from "./Logger";
-import { RideRepository } from "./RideRepository";
+import { Logger } from "../../infra/logger/LoggerConsole";
+import { RideRepository } from "../repository/RideRepository";
+
 
 export class GetRide{
 	constructor(private rideDAO: RideRepository, private logger: Logger){}

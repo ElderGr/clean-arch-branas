@@ -1,4 +1,4 @@
-import { RideRepository } from "./RideRepository";
+import { RideRepository } from "../repository/RideRepository";
 
 export class StartRide{
 	constructor(
