@@ -8,6 +8,7 @@ import { Signup } from "../src/application/usecases/Signup";
 import { GetRide } from "../src/application/usecases/GetRide";
 import { StartRide } from "../src/application/usecases/StartRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
+import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -22,11 +23,12 @@ beforeEach(() => {
 	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
 	const rideDAO = new RideRepositoryDatabase();
+	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
 	signup = new Signup(accountDAO, logger);
 	getAccount = new GetAccount(accountDAO);
 	requestRide = new RequestRide(rideDAO, accountDAO, logger);
-	getRide = new GetRide(rideDAO, logger);
+	getRide = new GetRide(rideDAO, positionRepository, logger);
 	acceptRide = new AcceptRide(rideDAO, accountDAO);
 	startRide = new StartRide(rideDAO);
 })

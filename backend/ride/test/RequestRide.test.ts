@@ -8,6 +8,7 @@ import DatabaseConnection from "../src/infra/database/DatabaseConnection";
 import { Signup } from "../src/application/usecases/Signup";
 import { GetRide } from "../src/application/usecases/GetRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
+import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 
 axios.defaults.validateStatus = function() {
 	return true;
@@ -21,14 +22,15 @@ let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
-	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
+	const accountRepository = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
-	const rideDAO = new RideRepositoryDatabase();
+	const rideRepository = new RideRepositoryDatabase();
+	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
-	signup = new Signup(accountDAO, logger);
-	getAccount = new GetAccount(accountDAO);
-	requestRide = new RequestRide(rideDAO, accountDAO, logger);
-	getRide = new GetRide(rideDAO, logger);
+	signup = new Signup(accountRepository, logger);
+	getAccount = new GetAccount(accountRepository);
+	requestRide = new RequestRide(rideRepository, accountRepository, logger);
+	getRide = new GetRide(rideRepository, positionRepository, logger);
 })
 
 test("Deve solicitar uma corrida", async function(){

@@ -36,7 +36,7 @@ beforeEach(() => {
 	updatePosition = new UpdatePosition(rideDAO, positionRepository);
 })
 
-test.skip("Deve iniciar uma corrida", async function(){
+test("Deve iniciar uma corrida", async function(){
 	const inputSignupPassenger = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -91,6 +91,7 @@ test.skip("Deve iniciar uma corrida", async function(){
 
 	const outputGetRide = await getRide.execute(outputRequestRide.rideId);
 	expect(outputGetRide.status).toBe('in_progress');
+	console.log(outputGetRide.distance, 'TEST FLAG')
 	expect(outputGetRide.distance).toBe(10);
 });
 

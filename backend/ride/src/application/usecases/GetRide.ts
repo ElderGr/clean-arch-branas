@@ -36,7 +36,8 @@ export class GetRide{
 			rideId: ride.rideId,
 			status: ride.getStatus(),
 			driverId: ride.getDriverId(),
-			passengerId: ride.passengerId
+			passengerId: ride.passengerId,
+			distance: distance
 		}
 	}
 }

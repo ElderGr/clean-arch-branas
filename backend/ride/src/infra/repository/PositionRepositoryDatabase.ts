@@ -8,13 +8,13 @@ export class PositionRepositoryDatabase implements PositionRepository {
 
     async save(position: Position): Promise<void> {
         await this.connection.query(
-            "insert into cccat14.position (position_id, ride_id, lat, long, date) values ($1, $2, $3, $4, $5)", 
+            "insert into cccat14.position(position_id, ride_id, lat, long, date) values ($1, $2, $3, $4, $5)", 
             [position.positionId, position.rideId, position.coord.lat, position.coord.long, position.date]
         );
     }
 
     async listByRideId(rideId: string): Promise<Position[]> {
-        const positionsData = await this.connection.query("select * from cccdb14.position where ride_id = $1 order by date", [rideId]);
+        const positionsData = await this.connection.query("select * from cccat14.position where ride_id = $1 order by date", [rideId]);
         const positions: Position[] = [];
         for(const positionData of positionsData) {
             positions.push(

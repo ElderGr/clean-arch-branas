@@ -8,6 +8,7 @@ import DatabaseConnection from "../src/infra/database/DatabaseConnection";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { GetRide } from "../src/application/usecases/GetRide";
 import { Signup } from "../src/application/usecases/Signup";
+import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -20,16 +21,17 @@ beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
 	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
-	const rideDAO = new RideRepositoryDatabase();
+	const rideRepository = new RideRepositoryDatabase();
+	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
 	signup = new Signup(accountDAO, logger);
 	getAccount = new GetAccount(accountDAO);
-	requestRide = new RequestRide(rideDAO, accountDAO, logger);
-	getRide = new GetRide(rideDAO, logger);
-	acceptRide = new AcceptRide(rideDAO, accountDAO);
+	requestRide = new RequestRide(rideRepository, accountDAO, logger);
+	getRide = new GetRide(rideRepository, positionRepository, logger);
+	acceptRide = new AcceptRide(rideRepository, accountDAO);
 })
 
-test.skip("Deve aceitar uma corrida", async function(){
+test("Deve aceitar uma corrida", async function(){
 	const inputSignupPassenger = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,

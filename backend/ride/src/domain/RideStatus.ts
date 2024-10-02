@@ -11,7 +11,7 @@ export abstract class RideStatus {
 }
 
 export class RequestedStatus extends RideStatus {
-    value = "requested";
+    value: string;
     constructor(ride: Ride) { 
         super(ride);
         this.value = "requested";
@@ -29,10 +29,10 @@ export class RequestedStatus extends RideStatus {
 }
 
 export class AcceptedStatus extends RideStatus {
-    value = "accepted";
+    value: string;
     constructor(ride: Ride) { 
         super(ride);
-        this.value = "requested";
+        this.value = "accepted";
     }
 
     request() {
@@ -47,7 +47,7 @@ export class AcceptedStatus extends RideStatus {
 }
 
 export class InProgressStatus extends RideStatus {
-    value = "accepted";
+    value: string;
     constructor(ride: Ride) { 
         super(ride);
         this.value = "in_progress";
@@ -74,7 +74,7 @@ export class RideStatusFactory {
             case "in_progress":
                 return new InProgressStatus(ride);
             default:
-                throw new Error("Invalid status");
+                throw new Error();
         }
     }
 }

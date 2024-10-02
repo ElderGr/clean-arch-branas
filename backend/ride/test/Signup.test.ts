@@ -25,8 +25,8 @@ beforeEach(() => {
 })
 
 test("Deve criar conta para o passageiro com stub", async function(){
-	const stubAccountDAOSave = sinon.stub(AccountRepositoryDatabase.prototype, "save").resolves();
-	const stubAccountDAOGetByEmail = sinon.stub(AccountRepositoryDatabase.prototype, "getByEmail").resolves(undefined);
+	// const stubAccountDAOSave = sinon.stub(AccountRepositoryDatabase.prototype, "save").resolves();
+	// const stubAccountDAOGetByEmail = sinon.stub(AccountRepositoryDatabase.prototype, "getByEmail").resolves(undefined);
 	const inputSignup = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -36,22 +36,22 @@ test("Deve criar conta para o passageiro com stub", async function(){
 	};
 	const outputSignup = await signup.execute(inputSignup);
 	expect(outputSignup.accountId).toBeDefined();
-	const stubAccountDAOGetById = sinon.stub(AccountRepositoryDatabase.prototype, "getById").resolves(Account.create(
-		inputSignup.name,
-		inputSignup.email,
-		inputSignup.cpf,
-		inputSignup.password,
-		inputSignup.isPassenger,
-		false
-	));
+	// const stubAccountDAOGetById = sinon.stub(AccountRepositoryDatabase.prototype, "getById").resolves(Account.create(
+	// 	inputSignup.name,
+	// 	inputSignup.email,
+	// 	inputSignup.cpf,
+	// 	inputSignup.password,
+	// 	inputSignup.isPassenger,
+	// 	false
+	// ));
 
 	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
 
 	expect(outputGetAccount?.name).toBe(inputSignup.name);
 	expect(outputGetAccount?.email).toBe(inputSignup.email);
-	stubAccountDAOGetByEmail.restore();
-	stubAccountDAOSave.restore();
-	stubAccountDAOGetById.restore();
+	// stubAccountDAOGetByEmail.restore();
+	// stubAccountDAOSave.restore();
+	// stubAccountDAOGetById.restore();
 })
 
 test("Deve criar conta para o passageiro com mock", async function(){
