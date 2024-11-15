@@ -10,6 +10,7 @@ import { StartRide } from "../src/application/usecases/StartRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { UpdatePosition } from "../src/application/usecases/UpdatePosition";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
+import { FinishRide } from "../src/application/usecases/FinishRide";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -19,6 +20,7 @@ let acceptRide: AcceptRide;
 let startRide: StartRide;
 let databaseConnection: PgPromiseAdapter;
 let updatePosition: UpdatePosition;
+let finishRide: FinishRide;
 
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
@@ -34,6 +36,7 @@ beforeEach(() => {
 	acceptRide = new AcceptRide(rideDAO, accountDAO);
 	startRide = new StartRide(rideDAO);
 	updatePosition = new UpdatePosition(rideDAO, positionRepository);
+    finishRide = new FinishRide(rideDAO, positionRepository)
 })
 
 test("Deve iniciar uma corrida", async function(){
@@ -88,10 +91,15 @@ test("Deve iniciar uma corrida", async function(){
 	};
 
 	await updatePosition.execute(inputUpdatePosition2);
+    const inputFinishRide = {
+        rideId: outputRequestRide.rideId
+    };
 
+    await finishRide.execute(inputFinishRide);
 	const outputGetRide = await getRide.execute(outputRequestRide.rideId);
-	expect(outputGetRide.status).toBe('in_progress');
+	expect(outputGetRide.status).toBe('completed');
 	expect(outputGetRide.distance).toBe(10);
+	expect(outputGetRide.fare).toBe(21);
 });
 
 afterEach(async () => {

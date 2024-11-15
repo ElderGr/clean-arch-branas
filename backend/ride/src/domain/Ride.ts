@@ -1,5 +1,9 @@
 import crypto from 'crypto';
 import { RideStatus, RideStatusFactory } from './RideStatus';
+import { DistanceCalculator } from './DistanceCalculator';
+import { Position } from './Position';
+import { Coord } from './Coord';
+import { FareCalculatorFactory } from './FareCalculator';
 export default class Ride {
     public status: RideStatus;
 
@@ -12,7 +16,10 @@ export default class Ride {
         readonly fromLat: number,
         readonly fromLong: number,
         readonly toLat: number,
-        readonly toLong: number
+        readonly toLong: number,
+        private fare: number = 0,
+        private distance: number = 0,
+        private lastPosition?: Coord
     ) {
         this.status = RideStatusFactory.create(this, status);
     }
@@ -57,5 +64,30 @@ export default class Ride {
 
     getDriverId() {
         return this.driverId;
+    }
+
+    finish() {
+        const fareCalculator = FareCalculatorFactory.create(this.date);
+        this.fare = fareCalculator.calculate(this.distance);
+        this.status.finish();
+    }
+
+    updatePosition(position: Position) {
+        if(this.lastPosition){
+            this.distance += DistanceCalculator.calculate(this.lastPosition, position.coord);
+        }
+        this.lastPosition = position.coord;
+    }
+
+    getFare() {
+        return this.fare;
+    }
+
+    getDistance() {
+        return this.distance;
+    }
+
+    getLastPosition() {
+        return this.lastPosition;
     }
 }
