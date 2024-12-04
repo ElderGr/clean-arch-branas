@@ -11,6 +11,10 @@ import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { UpdatePosition } from "../src/application/usecases/UpdatePosition";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 import { FinishRide } from "../src/application/usecases/FinishRide";
+import { Mediator } from "../src/infra/mediator/Mediator";
+import { ProcessPayment } from "../src/application/usecases/ProcessPayment";
+import { TransactionRepositoryORM } from "../src/infra/repository/TransactionRepositoryORM";
+import { SendReceipt } from "../src/application/usecases/SendReceipt";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -28,6 +32,7 @@ beforeEach(() => {
 	const logger = new Logger();
 	const rideDAO = new RideRepositoryDatabase();
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
+	const transactionRepository = new TransactionRepositoryORM(databaseConnection);
 
 	signup = new Signup(accountDAO, logger);
 	getAccount = new GetAccount(accountDAO);
@@ -36,7 +41,11 @@ beforeEach(() => {
 	acceptRide = new AcceptRide(rideDAO, accountDAO);
 	startRide = new StartRide(rideDAO);
 	updatePosition = new UpdatePosition(rideDAO, positionRepository);
-    finishRide = new FinishRide(rideDAO, positionRepository)
+	const processPayment = new ProcessPayment(transactionRepository)
+	const mediator = new Mediator();
+	mediator.register("rideCompleted", processPayment);
+	mediator.register("rideCompleted", new SendReceipt());
+    finishRide = new FinishRide(rideDAO, positionRepository, mediator);
 })
 
 test("Deve iniciar uma corrida", async function(){
