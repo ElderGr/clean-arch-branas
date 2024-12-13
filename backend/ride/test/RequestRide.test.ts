@@ -1,35 +1,30 @@
 import axios from "axios"
-import { GetAccount } from "../src/application/usecases/GetAccount";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepositoryDatabase";
 import { Logger } from "../src/infra/logger/LoggerConsole";
 import { RequestRide } from "../src/application/usecases/RequestRide";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepositoryDatabase";
 import DatabaseConnection from "../src/infra/database/DatabaseConnection";
-import { Signup } from "../src/application/usecases/Signup";
 import { GetRide } from "../src/application/usecases/GetRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
+import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
 
 axios.defaults.validateStatus = function() {
 	return true;
 }
 
-let signup: Signup;
-let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let databaseConnection: DatabaseConnection;
+let accountGatewayHttp: AccountGatewayHttp;
 
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
-	const accountRepository = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
 	const rideRepository = new RideRepositoryDatabase();
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
-	signup = new Signup(accountRepository, logger);
-	getAccount = new GetAccount(accountRepository);
-	requestRide = new RequestRide(rideRepository, accountRepository, logger);
+	accountGatewayHttp = new AccountGatewayHttp();
+	requestRide = new RequestRide(rideRepository, accountGatewayHttp, logger);
 	getRide = new GetRide(rideRepository, positionRepository, logger);
 })
 
@@ -41,7 +36,7 @@ test("Deve solicitar uma corrida", async function(){
 		isPassenger: true,
 		password: "123456"
 	};
-	const outputSignup = await signup.execute(inputSignup);
+	const outputSignup = await accountGatewayHttp.signup(inputSignup);
 	const inputRequestRide = {
 		passengerId: outputSignup.accountId,
 		fromLat: -23.533773,
@@ -65,7 +60,7 @@ test("Não deve poder solicitar uma corrida se a conta não for de um passageiro
 		isPassenger: false,
 		password: "123456"
 	};
-	const outputSignup = await signup.execute(inputSignup);
+	const outputSignup = await accountGatewayHttp.signup(inputSignup);
 	const inputRequestRide = {
 		passengerId: outputSignup.accountId,
 		fromLat: -23.533773,
@@ -84,7 +79,7 @@ test("Não deve poder solicitar uma corrida se o passageiro já tiver outra corr
 		isPassenger: true,
 		password: "123456"
 	};
-	const outputSignup = await signup.execute(inputSignup);
+	const outputSignup = await accountGatewayHttp.signup(inputSignup);
 	const inputRequestRide = {
 		passengerId: outputSignup.accountId,
 		fromLat: -23.533773,

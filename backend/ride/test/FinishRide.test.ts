@@ -1,23 +1,17 @@
-import { GetAccount } from "../src/application/usecases/GetAccount";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepositoryDatabase";
 import { Logger } from "../src/infra/logger/LoggerConsole";
 import { RequestRide } from "../src/application/usecases/RequestRide";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepositoryDatabase";
 import { AcceptRide } from "../src/application/usecases/AcceptRide";
-import { Signup } from "../src/application/usecases/Signup";
 import { GetRide } from "../src/application/usecases/GetRide";
 import { StartRide } from "../src/application/usecases/StartRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { UpdatePosition } from "../src/application/usecases/UpdatePosition";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 import { FinishRide } from "../src/application/usecases/FinishRide";
-import { Mediator } from "../src/infra/mediator/Mediator";
-import { ProcessPayment } from "../src/application/usecases/ProcessPayment";
-import { TransactionRepositoryORM } from "../src/infra/repository/TransactionRepositoryORM";
-import { SendReceipt } from "../src/application/usecases/SendReceipt";
+import { AccountGateway } from "../src/application/gateway/AccountGateway";
+import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
+import { PaymentGatewayHttp } from "../src/infra/gateway/PaymentGatewayHttp";
 
-let signup: Signup;
-let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
@@ -25,27 +19,25 @@ let startRide: StartRide;
 let databaseConnection: PgPromiseAdapter;
 let updatePosition: UpdatePosition;
 let finishRide: FinishRide;
+let accountGateway: AccountGateway;
 
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
-	const accountDAO = new AccountRepositoryDatabase(databaseConnection);
 	const logger = new Logger();
-	const rideDAO = new RideRepositoryDatabase();
+	const rideRepository = new RideRepositoryDatabase();
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
-	const transactionRepository = new TransactionRepositoryORM(databaseConnection);
 
-	signup = new Signup(accountDAO, logger);
-	getAccount = new GetAccount(accountDAO);
-	requestRide = new RequestRide(rideDAO, accountDAO, logger);
-	getRide = new GetRide(rideDAO, positionRepository, logger);
-	acceptRide = new AcceptRide(rideDAO, accountDAO);
-	startRide = new StartRide(rideDAO);
-	updatePosition = new UpdatePosition(rideDAO, positionRepository);
-	const processPayment = new ProcessPayment(transactionRepository)
-	const mediator = new Mediator();
-	mediator.register("rideCompleted", processPayment);
-	mediator.register("rideCompleted", new SendReceipt());
-    finishRide = new FinishRide(rideDAO, positionRepository, mediator);
+	accountGateway = new AccountGatewayHttp();
+	requestRide = new RequestRide(rideRepository, accountGateway, logger);
+	getRide = new GetRide(rideRepository, positionRepository, logger);
+	acceptRide = new AcceptRide(rideRepository, accountGateway);
+	startRide = new StartRide(rideRepository);
+	updatePosition = new UpdatePosition(rideRepository, positionRepository);
+	// const mediator = new Mediator();
+	// mediator.register("rideCompleted", processPayment);
+	// mediator.register("rideCompleted", new SendReceipt());
+	const paymentGateway = new PaymentGatewayHttp();
+    finishRide = new FinishRide(rideRepository, paymentGateway);
 })
 
 test("Deve iniciar uma corrida", async function(){
@@ -56,7 +48,7 @@ test("Deve iniciar uma corrida", async function(){
 		isPassenger: true,
 		password: "123456"
 	};
-	const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+	const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
 	const inputRequestRide = {
 		passengerId: outputSignupPassenger.accountId,
 		fromLat: -23.533773,
@@ -74,7 +66,7 @@ test("Deve iniciar uma corrida", async function(){
 		password: "123456"
 	};
 
-	const outputSignupDriver = await signup.execute(inputSignupDriver);
+	const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
 	const inputAcceptRide = {
 		rideId: outputRequestRide.rideId,
 		driverId: outputSignupDriver.accountId

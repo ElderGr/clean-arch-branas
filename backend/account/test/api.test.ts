@@ -15,9 +15,9 @@ test("Deve criar uma conta para o passageiro pela API", async function(){
 	};
 
 	//when
-	const responseSignup = await axios.post("http://localhost:3000/signup", inputSignup)
+	const responseSignup = await axios.post("http://localhost:3001/signup", inputSignup)
 	const outputSignup = responseSignup.data
-	const responseGetAccount = await axios.get(`http://localhost:3000/accounts/${outputSignup.accountId}`)
+	const responseGetAccount = await axios.get(`http://localhost:3001/accounts/${outputSignup.accountId}`)
 	const outputGetAccount = responseGetAccount.data
 	//then
 	expect(outputSignup.accountId).toBeDefined();
@@ -36,7 +36,7 @@ test("Não deve criar conta se o nome for inválido", async function(){
 	};
 
 	//when
-	const responseSignup = await axios.post("http://localhost:3000/signup", inputSignup);
+	const responseSignup = await axios.post("http://localhost:3001/signup", inputSignup);
 	expect(responseSignup.status).toBe(422);
 	const outputSignup = responseSignup.data;
 	expect(outputSignup.message).toBe('Invalid name');
@@ -55,9 +55,9 @@ test("Deve criar conta para o motorista", async function(){
 	};
 
 	//when
-	const responseSignup = await axios.post("http://localhost:3000/signup", inputSignup)
+	const responseSignup = await axios.post("http://localhost:3001/signup", inputSignup)
 	const outputSignup = responseSignup.data
-	const responseGetAccount = await axios.get(`http://localhost:3000/accounts/${outputSignup.accountId}`)
+	const responseGetAccount = await axios.get(`http://localhost:3001/accounts/${outputSignup.accountId}`)
 	const outputGetAccount = responseGetAccount.data
 	
 	//then
@@ -79,7 +79,7 @@ test("Não deve criar conta para o motorista com a placa inválida", async funct
 	};
 
 	//when
-	const responseSignup = await axios.post("http://localhost:3000/signup", inputSignup);
+	const responseSignup = await axios.post("http://localhost:3001/signup", inputSignup);
 	expect(responseSignup.status).toBe(422);
 	const outputSignup = responseSignup.data;
 	expect(outputSignup.message).toBe('Invalid car plate');	

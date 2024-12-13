@@ -1,4 +1,3 @@
-import { Transaction } from "../../domain/Transaction";
 import { TransactionRepository } from "../repository/TransactionRepository";
 
 export class GetTransactionByRideId {
