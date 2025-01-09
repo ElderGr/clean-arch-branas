@@ -3,6 +3,6 @@ export class SendReceipt {
     ){}
 
     async execute(input: any){
-        console.log(input)
+        console.log(input)    
     }
 }

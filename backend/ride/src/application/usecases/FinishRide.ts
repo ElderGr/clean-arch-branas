@@ -1,3 +1,4 @@
+import { Queue } from "../../infra/queue/Queue";
 import { PaymentGateway } from "../gateway/PaymentGateway";
 import { RideRepository } from "../repository/RideRepository";
 
@@ -5,7 +6,7 @@ export class FinishRide {
 	constructor(
 		private rideRepository: RideRepository,
 		private paymentGateway: PaymentGateway,
-		// private mediator: Mediator
+		private queue: Queue
 	){}
 	
 	async execute(input: Input){
@@ -16,10 +17,10 @@ export class FinishRide {
 		await this.rideRepository.update(ride);
 		await this.paymentGateway.processPayment({rideId: input.rideId, amount: ride.getFare()});
 		
-		// await this.mediator.publish("rideCompleted", {
-		// 	rideId: input.rideId, 
-		// 	amount: ride.getFare()
-		// });
+		await this.queue.publish("rideCompleted", {
+			rideId: ride.rideId,
+			amount: ride.getFare()
+		})
 	}
 }
 

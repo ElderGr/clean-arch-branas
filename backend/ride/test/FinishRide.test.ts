@@ -11,6 +11,7 @@ import { FinishRide } from "../src/application/usecases/FinishRide";
 import { AccountGateway } from "../src/application/gateway/AccountGateway";
 import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
 import { PaymentGatewayHttp } from "../src/infra/gateway/PaymentGatewayHttp";
+import { Queue } from "../src/infra/queue/Queue";
 
 let requestRide: RequestRide;
 let getRide: GetRide;
@@ -37,7 +38,8 @@ beforeEach(() => {
 	// mediator.register("rideCompleted", processPayment);
 	// mediator.register("rideCompleted", new SendReceipt());
 	const paymentGateway = new PaymentGatewayHttp();
-    finishRide = new FinishRide(rideRepository, paymentGateway);
+	const queue = new Queue();
+    finishRide = new FinishRide(rideRepository, paymentGateway, queue);
 })
 
 test("Deve iniciar uma corrida", async function(){
@@ -57,6 +59,7 @@ test("Deve iniciar uma corrida", async function(){
 		toLong: -46.633939
 	}
 	const outputRequestRide = await requestRide.execute(inputRequestRide);
+	console.log(outputRequestRide, "ride")
 	const inputSignupDriver = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -67,6 +70,7 @@ test("Deve iniciar uma corrida", async function(){
 	};
 
 	const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
+	console.log(outputSignupDriver, "driver")
 	const inputAcceptRide = {
 		rideId: outputRequestRide.rideId,
 		driverId: outputSignupDriver.accountId
