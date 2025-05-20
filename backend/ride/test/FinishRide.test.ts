@@ -2,7 +2,6 @@ import { Logger } from "../src/infra/logger/LoggerConsole";
 import { RequestRide } from "../src/application/usecases/RequestRide";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepositoryDatabase";
 import { AcceptRide } from "../src/application/usecases/AcceptRide";
-import { GetRide } from "../src/application/usecases/GetRide";
 import { StartRide } from "../src/application/usecases/StartRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { UpdatePosition } from "../src/application/usecases/UpdatePosition";
@@ -12,9 +11,12 @@ import { AccountGateway } from "../src/application/gateway/AccountGateway";
 import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
 import { PaymentGatewayHttp } from "../src/infra/gateway/PaymentGatewayHttp";
 import { Queue } from "../src/infra/queue/Queue";
+import { GetRideAPIComposition } from "../src/application/usecases/GetRideAPIComposition";
+import { GetRideQuery } from "../src/application/query/GetRideQuery";
+import { AxiosAdapter } from "../src/infra/http/AxiosAdapter";
 
 let requestRide: RequestRide;
-let getRide: GetRide;
+let getRide: GetRideQuery;
 let acceptRide: AcceptRide;
 let startRide: StartRide;
 let databaseConnection: PgPromiseAdapter;
@@ -28,9 +30,10 @@ beforeEach(() => {
 	const rideRepository = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
-	accountGateway = new AccountGatewayHttp();
+	accountGateway = new AccountGatewayHttp(new AxiosAdapter());
 	requestRide = new RequestRide(rideRepository, accountGateway, logger);
-	getRide = new GetRide(rideRepository, positionRepository, logger);
+	// getRide = new GetRideAPIComposition(rideRepository, accountGateway);
+	getRide = new GetRideQuery(databaseConnection);
 	acceptRide = new AcceptRide(rideRepository, accountGateway);
 	startRide = new StartRide(rideRepository);
 	updatePosition = new UpdatePosition(rideRepository, positionRepository);
@@ -103,6 +106,9 @@ test("Deve iniciar uma corrida", async function(){
 	expect(outputGetRide.status).toBe('completed');
 	expect(outputGetRide.distance).toBe(10);
 	expect(outputGetRide.fare).toBe(21);
+	expect(outputGetRide.passengerName).toBe("John Doe")
+	expect(outputGetRide.driverCarPlate).toBe("AAA9999")
+	expect(outputGetRide.passengerCpf).toBe("97456321558")
 });
 
 afterEach(async () => {

@@ -7,6 +7,7 @@ import { GetRide } from "../src/application/usecases/GetRide";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
+import { AxiosAdapter } from "../src/infra/http/AxiosAdapter";
 
 axios.defaults.validateStatus = function() {
 	return true;
@@ -23,7 +24,7 @@ beforeEach(() => {
 	const rideRepository = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
-	accountGatewayHttp = new AccountGatewayHttp();
+	accountGatewayHttp = new AccountGatewayHttp(new AxiosAdapter());
 	requestRide = new RequestRide(rideRepository, accountGatewayHttp, logger);
 	getRide = new GetRide(rideRepository, positionRepository, logger);
 })

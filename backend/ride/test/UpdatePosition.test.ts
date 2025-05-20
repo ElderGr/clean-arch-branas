@@ -9,6 +9,7 @@ import { UpdatePosition } from "../src/application/usecases/UpdatePosition";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepositoryDatabase";
 import { AccountGateway } from "../src/application/gateway/AccountGateway";
 import { AccountGatewayHttp } from "../src/infra/gateway/AccountGatewayHttp";
+import { AxiosAdapter } from "../src/infra/http/AxiosAdapter";
 
 let requestRide: RequestRide;
 let getRide: GetRide;
@@ -25,7 +26,7 @@ beforeEach(() => {
 	const rideDAO = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
-	accountGateway = new AccountGatewayHttp();
+	accountGateway = new AccountGatewayHttp(new AxiosAdapter());
 	requestRide = new RequestRide(rideDAO, accountGateway, logger);
 	getRide = new GetRide(rideDAO, positionRepository, logger);
 	acceptRide = new AcceptRide(rideDAO, accountGateway);

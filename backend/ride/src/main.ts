@@ -9,21 +9,27 @@ import { QueueController } from "./infra/queue/QueueController";
 import { RequestRide } from "./application/usecases/RequestRide";
 import { RideRepositoryDatabase } from "./infra/repository/RideRepositoryDatabase";
 import { AccountGatewayHttp } from "./infra/gateway/AccountGatewayHttp";
+import { UpdateRideProjectionAPIComposition } from "./application/usecases/UpdateRideProjectionAPIComposition";
+import { FetchAdapter } from "./infra/http/FetchAdapter";
+import { AxiosAdapter } from "./infra/http/AxiosAdapter";
 
 const httpServer = new ExpressAdapter();
 const databaseConnection = new PgPromiseAdapter();
 const logger = new Logger();
 const queue = new Queue();
 const rideRepository = new RideRepositoryDatabase(databaseConnection);
-const accountGatewayHttp = new AccountGatewayHttp();
+const accountGatewayHttp = new AccountGatewayHttp(new AxiosAdapter());
 
 const sendReceipt = new SendReceipt();
 const requestRide = new RequestRide(rideRepository, accountGatewayHttp, logger);
+const updateRideProjection = new UpdateRideProjectionAPIComposition(databaseConnection, accountGatewayHttp);
+
 const registry = Registry.getInstance();
 registry.register("httpServer", httpServer);
 registry.register("queue", queue)
 registry.register("sendReceipt", sendReceipt)
 registry.register("requestRide", requestRide)
+registry.register("updateRideProjection", updateRideProjection)
 
 new MainController();
 new QueueController();
