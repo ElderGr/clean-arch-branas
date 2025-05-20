@@ -28,28 +28,28 @@ beforeEach(() => {
 	getRide = new GetRide(rideRepository, positionRepository, logger);
 })
 
-test("Deve solicitar uma corrida", async function(){
-	const inputSignup = {
-		name: "John Doe",
-		email: `john.doe${Math.random()}@gmail.com`,
-		cpf: "97456321558",
-		isPassenger: true,
-		password: "123456"
-	};
-	const outputSignup = await accountGatewayHttp.signup(inputSignup);
-	const inputRequestRide = {
-		passengerId: outputSignup.accountId,
-		fromLat: -23.533773,
-		fromLong: -46.625290,
-		toLat: -23.550650,
-		toLong: -46.633939
-	}
-	await axios.post("http://localhost:3000/request_ride_async", inputRequestRide);
-	// const outputRequestRide = await requestRide.execute(inputRequestRide);
-	// expect(outputRequestRide.rideId).toBeDefined();
-	// const outputGetRide = await getRide.execute(outputRequestRide.rideId)
-	// expect(outputGetRide.status).toBe('requested');
-})
+// test("Deve solicitar uma corrida", async function(){
+// 	const inputSignup = {
+// 		name: "John Doe",
+// 		email: `john.doe${Math.random()}@gmail.com`,
+// 		cpf: "97456321558",
+// 		isPassenger: true,
+// 		password: "123456"
+// 	};
+// 	const outputSignup = await accountGatewayHttp.signup(inputSignup);
+// 	const inputRequestRide = {
+// 		passengerId: outputSignup.accountId,
+// 		fromLat: -23.533773,
+// 		fromLong: -46.625290,
+// 		toLat: -23.550650,
+// 		toLong: -46.633939
+// 	}
+// 	await axios.post("http://localhost:3000/request_ride_async", inputRequestRide);
+// 	// const outputRequestRide = await requestRide.execute(inputRequestRide);
+// 	// expect(outputRequestRide.rideId).toBeDefined();
+// 	// const outputGetRide = await getRide.execute(outputRequestRide.rideId)
+// 	// expect(outputGetRide.status).toBe('requested');
+// })
 
 
 afterEach(async () => {

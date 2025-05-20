@@ -17,7 +17,7 @@ let accountGatewayHttp: AccountGatewayHttp;
 beforeEach(() => {	
 	databaseConnection = new PgPromiseAdapter();
 	const logger = new Logger();
-	const rideRepository = new RideRepositoryDatabase();
+	const rideRepository = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
 	accountGatewayHttp = new AccountGatewayHttp();

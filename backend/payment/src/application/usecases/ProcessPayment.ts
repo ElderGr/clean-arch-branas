@@ -10,7 +10,6 @@ export class ProcessPayment {
 
     async execute(input: Input): Promise<void>{
         const transaction = Transaction.create(input.rideId, input.amount);
-        console.log(transaction)
         transaction.pay();
         await this.transactionRepository.save(transaction);
         await this.queue.publish("paymentApproved", { 

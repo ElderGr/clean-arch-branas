@@ -23,6 +23,7 @@ export class AccountRepositoryDatabase implements AccountRepository {
     }
 
     async getByEmail(email: string): Promise<Account | undefined>{
+        console.log(`account ${email}`);
 		const [account] = await this.connection.query("select * from cccat14.account where email = $1", [email]);
         if(!account) return undefined;
         return Account.restore(

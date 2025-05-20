@@ -25,7 +25,7 @@ let accountGateway: AccountGateway;
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
 	const logger = new Logger();
-	const rideRepository = new RideRepositoryDatabase();
+	const rideRepository = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
 	accountGateway = new AccountGatewayHttp();
@@ -59,7 +59,6 @@ test("Deve iniciar uma corrida", async function(){
 		toLong: -46.633939
 	}
 	const outputRequestRide = await requestRide.execute(inputRequestRide);
-	console.log(outputRequestRide, "ride")
 	const inputSignupDriver = {
 		name: "John Doe",
 		email: `john.doe${Math.random()}@gmail.com`,
@@ -70,7 +69,6 @@ test("Deve iniciar uma corrida", async function(){
 	};
 
 	const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
-	console.log(outputSignupDriver, "driver")
 	const inputAcceptRide = {
 		rideId: outputRequestRide.rideId,
 		driverId: outputSignupDriver.accountId

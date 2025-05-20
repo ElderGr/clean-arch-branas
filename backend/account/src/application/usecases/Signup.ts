@@ -15,6 +15,7 @@ export class Signup{
 	async execute(input: Input): Promise<Output> {
 		this.logger.log(`signup ${input.name}`);
 		const existingAccount = await this.accountDAO.getByEmail(input.email)
+		this.logger.log(`account ${existingAccount}`);
 		if (existingAccount) throw new Error("Duplicated account");
 		const account = Account.create(
 			input.name,

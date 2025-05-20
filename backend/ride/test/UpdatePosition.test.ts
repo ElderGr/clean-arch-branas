@@ -22,7 +22,7 @@ let accountGateway: AccountGateway;
 beforeEach(() => {
 	databaseConnection = new PgPromiseAdapter();
 	const logger = new Logger();
-	const rideDAO = new RideRepositoryDatabase();
+	const rideDAO = new RideRepositoryDatabase(databaseConnection);
 	const positionRepository = new PositionRepositoryDatabase(databaseConnection);
 
 	accountGateway = new AccountGatewayHttp();
